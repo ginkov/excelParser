@@ -1,13 +1,22 @@
 package com.cisco.test;
 
+import com.cisco.util.excel.Alias;
 import com.cisco.util.excel.Validable;
 
 public class Student implements Validable {
 	
+	@Alias("姓名")
 	private String name;
+	
+	@Alias("年龄")
 	private Integer age;
+	
+	@Alias({"昵称","描述"})
 	private String description;
+	
+	@Alias("成绩")
 	private Double score;
+	
 	public String getName() {
 		return name;
 	}

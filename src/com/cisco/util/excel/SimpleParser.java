@@ -29,6 +29,12 @@ public class SimpleParser<T extends Validable> {
 	
 	private List<T> validRows;
 	
+	/*
+	 *  把字段的名称，或者别名，与字段对应起来.
+	 *  比如，字段可能叫 stundentName, 在 Excel 里可能是 stundentName, 也可能是 name, 
+	 *  	或者是 学生姓名, 姓名.
+	 *  这个 Map 就是把 stundentName, name, 学生姓名, 姓名 都映射成 studentName 这个 Field.
+	 */
 	private Map<String, Field> name2Fld;
 	private Map<Field, Integer> fldPosition;
 
@@ -38,10 +44,25 @@ public class SimpleParser<T extends Validable> {
 		this.validRows = new ArrayList<>();
 	}
 	
+	/**
+	 * 解析 Excel 的每一行，返回结果.
+	 * @return
+	 */
 	public List<T> parse() {
-
+		
+		/*
+		 * 目标类可以通过 @Alias 注解，说明本字段的别名.
+		 */
 		for(Field f: clazz.getDeclaredFields()) {
 			name2Fld.put(f.getName(), f);
+			Alias a = f.getDeclaredAnnotation(Alias.class);
+			if( a != null && ! isEmpty(a.value())) {
+				for(String s: a.value()) {
+					if(s!=null && ! s.isEmpty()) {
+						name2Fld.put(s.trim(), f);
+					}
+				}
+			}
 		}
 	    boolean headerFound = false;
 		try {
@@ -153,6 +174,21 @@ public class SimpleParser<T extends Validable> {
 	
 	public void setIs(InputStream is) {
 		this.is = is;
+	}
+	
+	/**
+	 * 判断一个 String[] alias 是否为空.
+	 * @param a
+	 * @return
+	 */
+	private boolean isEmpty(String [] alias) {
+		boolean result = true;
+		for(String s: alias) {
+			if(s!=null && !s.isEmpty()) {
+				result = false;
+			}
+		}
+		return result;
 	}
 
 }
