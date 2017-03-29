@@ -58,8 +58,14 @@ public class SimpleParser<T extends Validable> {
 			Alias a = f.getDeclaredAnnotation(Alias.class);
 			if( a != null && ! isEmpty(a.value())) {
 				for(String s: a.value()) {
-					if(s!=null && ! s.isEmpty()) {
-						name2Fld.put(s.trim(), f);
+					String sTrim = s.trim();
+					if(!sTrim.isEmpty()) {
+						if(name2Fld.containsKey(sTrim)) {
+							log.errorv("字段{0}的别名{1}与其它字段冲突.", f.getName(), sTrim);
+						}
+						else {
+							name2Fld.put(sTrim, f);
+						}
 					}
 				}
 			}
